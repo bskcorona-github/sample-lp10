@@ -14,10 +14,51 @@ type Service = {
   durationMinutes: number;
 };
 
+// モックデータ
+const mockServices: Service[] = [
+  {
+    id: 1,
+    title: "フェイシャルトリートメント",
+    description:
+      "お肌の状態に合わせたカスタマイズトリートメント。美容成分をたっぷり含んだ美容液で肌を整えます。",
+    imageUrl: "/images/services/facial.jpg",
+    price: 8800,
+    durationMinutes: 60,
+  },
+  {
+    id: 2,
+    title: "ヘッドスパ",
+    description:
+      "頭皮マッサージと栄養補給で、髪と頭皮に活力を。日常のストレスからも解放されるリラックスタイム。",
+    imageUrl: "/images/services/headspa.jpg",
+    price: 7700,
+    durationMinutes: 45,
+  },
+  {
+    id: 3,
+    title: "全身マッサージ",
+    description:
+      "筋肉の緊張をほぐし、血行を促進する全身マッサージ。疲れた体に活力を取り戻します。",
+    imageUrl: "/images/services/massage.jpg",
+    price: 11000,
+    durationMinutes: 90,
+  },
+  {
+    id: 4,
+    title: "ハンド＆フットケア",
+    description:
+      "手と足の特別なケア。古い角質を取り除き、保湿ケアで柔らかくなめらかな肌へ。",
+    imageUrl: "/images/services/hand-foot.jpg",
+    price: 6600,
+    durationMinutes: 45,
+  },
+];
+
 export default function Home() {
   const [services, setServices] = useState<Service[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [usingMockData, setUsingMockData] = useState(false);
 
   // サービス一覧をAPIから取得
   useEffect(() => {
@@ -28,11 +69,25 @@ export default function Home() {
           throw new Error("サービスデータの取得に失敗しました");
         }
         const data = await response.json();
-        setServices(data);
+
+        // データが空の場合はモックデータを使用
+        if (data && data.length > 0) {
+          setServices(data);
+          setUsingMockData(false);
+        } else {
+          console.log("APIからのデータが空のため、モックデータを使用します");
+          setServices(mockServices);
+          setUsingMockData(true);
+        }
+
         setError(null);
       } catch (err) {
         console.error("サービス取得エラー:", err);
-        setError("サービスの読み込みに失敗しました");
+        // エラー時もモックデータを使用
+        console.log("API接続エラーのため、モックデータを使用します");
+        setServices(mockServices);
+        setUsingMockData(true);
+        setError(null); // エラーは表示しない
       } finally {
         setIsLoading(false);
       }
@@ -96,6 +151,11 @@ export default function Home() {
             <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto px-2">
               当サロンでは、お客様のニーズに合わせた多彩なトリートメントをご用意しています。心身のリラクゼーションと美しさの向上を実現する上質なサービスをお楽しみください。
             </p>
+            {usingMockData && (
+              <p className="text-xs text-amber-600 mt-2">
+                ※現在、デモ用のサンプルデータを表示しています
+              </p>
+            )}
           </ScrollAnimation>
 
           {isLoading ? (
