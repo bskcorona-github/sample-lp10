@@ -1,103 +1,298 @@
-import Image from "next/image";
+"use client";
+
+import Link from "next/link";
+import { useState, useEffect } from "react";
+
+type Service = {
+  id: number;
+  title: string;
+  description: string;
+  imageUrl: string;
+  price: number;
+  durationMinutes: number;
+};
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [services, setServices] = useState<Service[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  // サービス一覧をAPIから取得
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await fetch("/api/services");
+        if (!response.ok) {
+          throw new Error("サービスデータの取得に失敗しました");
+        }
+        const data = await response.json();
+        setServices(data);
+        setError(null);
+      } catch (err) {
+        console.error("サービス取得エラー:", err);
+        setError("サービスの読み込みに失敗しました");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchServices();
+  }, []);
+
+  return (
+    <>
+      {/* ヒーローセクション */}
+      <section className="relative bg-gray-50">
+        <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center">
+          <div className="md:w-1/2 mb-10 md:mb-0 md:pr-10">
+            <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+              最高級の
+              <span className="text-rose-600">美容体験</span>
+              をあなたに
+            </h1>
+            <p className="text-xl text-gray-600 mb-8">
+              心地よい空間で、日常の喧騒から離れた贅沢なひとときを。プロフェッショナルによる最高品質のトリートメントで、美しさと癒しを提供します。
+            </p>
+            <Link
+              href="/reservation"
+              className="inline-block bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 px-8 rounded-md shadow-md transition duration-300"
+            >
+              今すぐ予約する
+            </Link>
+          </div>
+          <div className="md:w-1/2 relative">
+            <div
+              className="h-64 md:h-96 w-full relative rounded-lg overflow-hidden shadow-xl"
+              style={{
+                position: "relative",
+                backgroundImage: `url('/images/hero.jpg')`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+              }}
+            ></div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </section>
+
+      {/* サービス一覧セクション */}
+      <section id="services" className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              サービス一覧
+            </h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              当サロンでは、お客様のニーズに合わせた多彩なトリートメントをご用意しています。心身のリラクゼーションと美しさの向上を実現する上質なサービスをお楽しみください。
+            </p>
+          </div>
+
+          {isLoading ? (
+            <div className="text-center py-12">
+              <p className="text-gray-600">読み込み中...</p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-12">
+              <p className="text-red-600">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="mt-4 inline-block bg-rose-600 text-white px-4 py-2 rounded-md"
+              >
+                再読み込み
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+              {services.map((service) => (
+                <div
+                  key={service.id}
+                  className="bg-white rounded-lg overflow-hidden shadow-md transition-transform duration-300 hover:shadow-lg hover:-translate-y-1"
+                >
+                  <div className="h-56 bg-gray-200 relative">
+                    {/* 画像がある場合は表示、ない場合はプレースホルダー */}
+                    {service.imageUrl ? (
+                      <div className="w-full h-full relative">
+                        <img
+                          src={service.imageUrl}
+                          alt={service.title}
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-rose-100">
+                        <span className="text-rose-600">
+                          {service.title}画像
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      {service.title}
+                    </h3>
+                    <p className="text-gray-600 mb-4">{service.description}</p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-lg font-semibold text-rose-600">
+                        ¥{service.price.toLocaleString()}
+                      </span>
+                      <span className="text-sm text-gray-500">
+                        所要時間: {service.durationMinutes}分
+                      </span>
+                    </div>
+                    <Link
+                      href="/reservation"
+                      className="mt-4 inline-block bg-rose-100 hover:bg-rose-200 text-rose-700 font-medium py-2 px-4 rounded-md transition w-full text-center"
+                    >
+                      予約する
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* FAQ セクション */}
+      <section id="faq" className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              よくある質問
+            </h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              お客様からよくいただくご質問にお答えします。さらにご不明な点がございましたら、お気軽にお問い合わせください。
+            </p>
+          </div>
+
+          <div className="space-y-6 max-w-3xl mx-auto">
+            {/* FAQ項目1 */}
+            <div className="border border-gray-200 rounded-lg overflow-hidden">
+              <details className="group">
+                <summary className="flex justify-between items-center p-6 cursor-pointer">
+                  <h3 className="text-lg font-medium text-gray-900">
+                    予約のキャンセルはできますか？
+                  </h3>
+                  <span className="ml-6 flex-shrink-0 text-gray-400 group-open:rotate-180 transition-transform">
+                    <svg
+                      className="h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </span>
+                </summary>
+                <div className="px-6 pb-6 pt-0">
+                  <p className="text-gray-600">
+                    ご予約のキャンセルは、予約日の2日前までであれば可能です。それ以降のキャンセルについては、キャンセル料が発生する場合がございますので、お早めにご連絡ください。
+                  </p>
+                </div>
+              </details>
+            </div>
+
+            {/* FAQ項目2 */}
+            <div className="border border-gray-200 rounded-lg overflow-hidden">
+              <details className="group">
+                <summary className="flex justify-between items-center p-6 cursor-pointer">
+                  <h3 className="text-lg font-medium text-gray-900">
+                    初めての方でも安心して利用できますか？
+                  </h3>
+                  <span className="ml-6 flex-shrink-0 text-gray-400 group-open:rotate-180 transition-transform">
+                    <svg
+                      className="h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </span>
+                </summary>
+                <div className="px-6 pb-6 pt-0">
+                  <p className="text-gray-600">
+                    はい、もちろんです。初めてご利用のお客様には、カウンセリングを丁寧に行い、お客様のお肌の状態やご要望に合わせたトリートメントをご提案いたします。どのようなサービスが自分に合っているか分からない場合もお気軽にご相談ください。
+                  </p>
+                </div>
+              </details>
+            </div>
+
+            {/* FAQ項目3 */}
+            <div className="border border-gray-200 rounded-lg overflow-hidden">
+              <details className="group">
+                <summary className="flex justify-between items-center p-6 cursor-pointer">
+                  <h3 className="text-lg font-medium text-gray-900">
+                    支払い方法は何がありますか？
+                  </h3>
+                  <span className="ml-6 flex-shrink-0 text-gray-400 group-open:rotate-180 transition-transform">
+                    <svg
+                      className="h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </span>
+                </summary>
+                <div className="px-6 pb-6 pt-0">
+                  <p className="text-gray-600">
+                    当サロンでは、クレジットカード（VISA、MasterCard、JCB、American
+                    Express）、電子マネー、現金でのお支払いに対応しております。オンライン予約の場合は、Stripeを通じたクレジットカード決済が可能です。
+                  </p>
+                </div>
+              </details>
+            </div>
+
+            {/* FAQ項目4 */}
+            <div className="border border-gray-200 rounded-lg overflow-hidden">
+              <details className="group">
+                <summary className="flex justify-between items-center p-6 cursor-pointer">
+                  <h3 className="text-lg font-medium text-gray-900">
+                    どのような化粧品を使用していますか？
+                  </h3>
+                  <span className="ml-6 flex-shrink-0 text-gray-400 group-open:rotate-180 transition-transform">
+                    <svg
+                      className="h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </span>
+                </summary>
+                <div className="px-6 pb-6 pt-0">
+                  <p className="text-gray-600">
+                    当サロンでは、オーガニック成分を中心とした高品質な化粧品を使用しています。パラベン、鉱物油、合成香料などを含まない製品を厳選し、敏感肌の方にも安心してご利用いただけるよう配慮しております。
+                  </p>
+                </div>
+              </details>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
   );
 }
