@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useRef } from "react";
+import { ReactNode, useRef, useEffect, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
 type ParallaxProps = {
@@ -9,6 +9,7 @@ type ParallaxProps = {
   direction?: "up" | "down" | "left" | "right";
   className?: string;
   containerClassName?: string;
+  disableOnMobile?: boolean;
 };
 
 export default function Parallax({
@@ -17,14 +18,30 @@ export default function Parallax({
   direction = "up",
   className = "",
   containerClassName = "",
+  disableOnMobile = true,
 }: ParallaxProps) {
   const ref = useRef(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // 画面幅を検出
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkIfMobile();
+    window.addEventListener("resize", checkIfMobile);
+    return () => window.removeEventListener("resize", checkIfMobile);
+  }, []);
+
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
   });
 
-  const value = 100 * speed;
+  // モバイルの場合は効果を弱める
+  const effectSpeed = isMobile && disableOnMobile ? speed * 0.3 : speed;
+  const value = 100 * effectSpeed;
 
   // すべての変換関数を最初に定義
   const yUp = useTransform(scrollYProgress, [0, 1], [value, -value]);
@@ -45,6 +62,19 @@ export default function Parallax({
     x = xLeft;
   } else if (direction === "right") {
     x = xRight;
+  }
+
+  // モバイルでは効果を無効にする
+  if (isMobile && disableOnMobile) {
+    const disabledClass = `${className} transform-none`;
+    return (
+      <div
+        ref={ref}
+        className={`relative overflow-hidden ${containerClassName}`}
+      >
+        <div className={disabledClass}>{children}</div>
+      </div>
+    );
   }
 
   return (
